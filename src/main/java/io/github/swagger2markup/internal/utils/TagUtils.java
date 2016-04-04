@@ -39,7 +39,7 @@ public class TagUtils {
      */
     public static Map<String, Tag> convertTagsListToMap(List<Tag> tags) {
         if (tags == null) {
-            tags = new ArrayList<>();
+            tags = new ArrayList<Tag>();
         }
         Map<String, Tag> tagsMap = new HashMap<>();
         for (Tag tag : tags) tagsMap.put(tag.getName(), tag);
