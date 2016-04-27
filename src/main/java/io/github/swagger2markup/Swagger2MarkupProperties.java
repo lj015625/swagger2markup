@@ -55,6 +55,7 @@ public class Swagger2MarkupProperties {
     public static final String FLAT_BODY_ENABLED = PROPERTIES_PREFIX + ".flatBodyEnabled";
     public static final String ANCHOR_PREFIX = PROPERTIES_PREFIX + ".anchorPrefix";
     public static final String OVERVIEW_DOCUMENT = PROPERTIES_PREFIX + ".overviewDocument";
+    public static final String JIRA_DOCUMENT = PROPERTIES_PREFIX + ".jiraDocument";
     public static final String PATHS_DOCUMENT = PROPERTIES_PREFIX + ".pathsDocument";
     public static final String DEFINITIONS_DOCUMENT = PROPERTIES_PREFIX + ".definitionsDocument";
     public static final String SECURITY_DOCUMENT = PROPERTIES_PREFIX + ".securityDocument";

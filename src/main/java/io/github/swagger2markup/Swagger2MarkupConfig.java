@@ -177,6 +177,12 @@ public interface Swagger2MarkupConfig {
     String getOverviewDocument();
 
     /**
+     * Jira document name (without extension).
+     * @return the jira document name
+     */
+    String getJiraDocument();
+    
+    /**
      * Paths document name (without extension).
      *
      * @return the paths document name (without extension)

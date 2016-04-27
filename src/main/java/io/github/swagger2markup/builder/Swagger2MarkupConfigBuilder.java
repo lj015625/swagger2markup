@@ -17,12 +17,14 @@ package io.github.swagger2markup.builder;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Ordering;
+
 import io.github.swagger2markup.*;
 import io.github.swagger2markup.markup.builder.LineSeparator;
 import io.github.swagger2markup.markup.builder.MarkupLanguage;
 import io.github.swagger2markup.model.PathOperation;
 import io.swagger.models.HttpMethod;
 import io.swagger.models.parameters.Parameter;
+
 import org.apache.commons.configuration2.*;
 import org.apache.commons.configuration2.builder.fluent.Configurations;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -115,6 +117,7 @@ public class Swagger2MarkupConfigBuilder  {
         config.flatBodyEnabled = swagger2MarkupProperties.getRequiredBoolean(FLAT_BODY_ENABLED);
         config.anchorPrefix = swagger2MarkupProperties.getString(ANCHOR_PREFIX, null);
         config.overviewDocument = swagger2MarkupProperties.getRequiredString(OVERVIEW_DOCUMENT);
+        config.jiraDocument = swagger2MarkupProperties.getRequiredString(JIRA_DOCUMENT);
         config.pathsDocument = swagger2MarkupProperties.getRequiredString(PATHS_DOCUMENT);
         config.definitionsDocument = swagger2MarkupProperties.getRequiredString(DEFINITIONS_DOCUMENT);
         config.securityDocument = swagger2MarkupProperties.getRequiredString(SECURITY_DOCUMENT);
@@ -599,6 +602,7 @@ public class Swagger2MarkupConfigBuilder  {
         private LineSeparator lineSeparator;
 
         private String overviewDocument;
+        private String jiraDocument;
         private String pathsDocument;
         private String definitionsDocument;
         private String securityDocument;
@@ -752,6 +756,12 @@ public class Swagger2MarkupConfigBuilder  {
             return overviewDocument;
         }
 
+        @Override
+        public String getJiraDocument()
+        {
+            return jiraDocument;
+        }
+        
         @Override
         public String getPathsDocument() {
             return pathsDocument;

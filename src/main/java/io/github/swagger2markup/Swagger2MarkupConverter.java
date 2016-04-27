@@ -18,14 +18,17 @@ package io.github.swagger2markup;
 import io.github.swagger2markup.builder.Swagger2MarkupConfigBuilder;
 import io.github.swagger2markup.builder.Swagger2MarkupExtensionRegistryBuilder;
 import io.github.swagger2markup.internal.document.builder.DefinitionsDocumentBuilder;
+import io.github.swagger2markup.internal.document.builder.JiraDocumentBuilder;
 import io.github.swagger2markup.internal.document.builder.OverviewDocumentBuilder;
 import io.github.swagger2markup.internal.document.builder.PathsDocumentBuilder;
 import io.github.swagger2markup.internal.document.builder.SecurityDocumentBuilder;
-import io.github.swagger2markup.spi.*;
+import io.github.swagger2markup.spi.DefinitionsDocumentExtension;
+import io.github.swagger2markup.spi.OverviewDocumentExtension;
+import io.github.swagger2markup.spi.PathsDocumentExtension;
+import io.github.swagger2markup.spi.SecurityDocumentExtension;
+import io.github.swagger2markup.spi.SwaggerModelExtension;
 import io.swagger.models.Swagger;
 import io.swagger.parser.SwaggerParser;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.Validate;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -39,6 +42,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.Validate;
 
 
 /**
@@ -171,6 +177,7 @@ public class Swagger2MarkupConverter {
         Validate.notNull(outputDirectory, "outputDirectory must not be null");
         
         new OverviewDocumentBuilder(context, extensionRegistry, outputDirectory).build().writeToFile(outputDirectory.resolve(context.config.getOverviewDocument()), StandardCharsets.UTF_8);
+        new JiraDocumentBuilder(context, extensionRegistry, outputDirectory).build().writeToFile(outputDirectory.resolve(context.config.getJiraDocument()), StandardCharsets.UTF_8);
         new PathsDocumentBuilder(context, extensionRegistry, outputDirectory).build().writeToFile(outputDirectory.resolve(context.config.getPathsDocument()), StandardCharsets.UTF_8);
         new DefinitionsDocumentBuilder(context, extensionRegistry, outputDirectory).build().writeToFile(outputDirectory.resolve(context.config.getDefinitionsDocument()), StandardCharsets.UTF_8);
         new SecurityDocumentBuilder(context, extensionRegistry, outputDirectory).build().writeToFile(outputDirectory.resolve(context.config.getSecurityDocument()), StandardCharsets.UTF_8);
@@ -202,6 +209,7 @@ public class Swagger2MarkupConverter {
         Validate.notNull(outputFile, "outputFile must not be null");
 
         new OverviewDocumentBuilder(context,extensionRegistry,  null).build().writeToFile(outputFile, StandardCharsets.UTF_8);
+        new JiraDocumentBuilder(context,extensionRegistry,  null).build().writeToFile(outputFile, StandardCharsets.UTF_8);
         new PathsDocumentBuilder(context, extensionRegistry, null).build().writeToFile(outputFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         new DefinitionsDocumentBuilder(context, extensionRegistry, null).build().writeToFile(outputFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         new SecurityDocumentBuilder(context, extensionRegistry, null).build().writeToFile(outputFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
@@ -216,6 +224,7 @@ public class Swagger2MarkupConverter {
         Validate.notNull(outputFile, "outputFile must not be null");
 
         new OverviewDocumentBuilder(context, extensionRegistry, null).build().writeToFileWithoutExtension(outputFile, StandardCharsets.UTF_8);
+        new JiraDocumentBuilder(context,extensionRegistry,  null).build().writeToFileWithoutExtension(outputFile, StandardCharsets.UTF_8);
         new PathsDocumentBuilder(context, extensionRegistry, null).build().writeToFileWithoutExtension(outputFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         new DefinitionsDocumentBuilder(context, extensionRegistry, null).build().writeToFileWithoutExtension(outputFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
         new SecurityDocumentBuilder(context, extensionRegistry, null).build().writeToFileWithoutExtension(outputFile, StandardCharsets.UTF_8, StandardOpenOption.APPEND);
@@ -230,6 +239,7 @@ public class Swagger2MarkupConverter {
 
         StringBuilder sb = new StringBuilder();
         sb.append(new OverviewDocumentBuilder(context,extensionRegistry,  null).build().toString());
+        new JiraDocumentBuilder(context,extensionRegistry,  null).build().toString();
         sb.append(new PathsDocumentBuilder(context, extensionRegistry, null).build().toString());
         sb.append(new DefinitionsDocumentBuilder(context, extensionRegistry, null).build().toString());
         sb.append(new SecurityDocumentBuilder(context, extensionRegistry, null).build().toString());
@@ -241,6 +251,7 @@ public class Swagger2MarkupConverter {
         private final URI swaggerLocation;
         private Swagger2MarkupConfig config;
         private Swagger2MarkupExtensionRegistry extensionRegistry;
+        private URL jiraJQLURL;
 
         /**
          * Creates a Builder from a remote URL.
@@ -302,6 +313,12 @@ public class Swagger2MarkupConverter {
             return this;
         }
 
+        public Builder withJiraJQL(URL jiraJQLURL) {
+            Validate.notNull(jiraJQLURL, "jiraJQLURL must not be null");
+            this.jiraJQLURL = jiraJQLURL;
+            return this;
+        }
+        
         public Swagger2MarkupConverter build() {
             if (config == null)
                 config = new Swagger2MarkupConfigBuilder().build();
@@ -309,7 +326,7 @@ public class Swagger2MarkupConverter {
             if (extensionRegistry == null)
                 extensionRegistry = new Swagger2MarkupExtensionRegistryBuilder().build();
 
-            Context context = new Context(config, swagger, swaggerLocation);
+            Context context = new Context(config, swagger, swaggerLocation, jiraJQLURL);
 
             initExtensions(context);
 
@@ -346,11 +363,13 @@ public class Swagger2MarkupConverter {
         private Swagger2MarkupConfig config;
         private Swagger swagger;
         private URI swaggerLocation;
+        private URL jiraJQLURL;
 
-        Context(Swagger2MarkupConfig config, Swagger swagger, URI swaggerLocation) {
+        Context(Swagger2MarkupConfig config, Swagger swagger, URI swaggerLocation, URL jiraJQLURL) {
             this.config = config;
             this.swagger = swagger;
             this.swaggerLocation = swaggerLocation;
+            this.jiraJQLURL = jiraJQLURL;
         }
 
         public Swagger2MarkupConfig getConfig() {
@@ -363,6 +382,11 @@ public class Swagger2MarkupConverter {
 
         public URI getSwaggerLocation() {
             return swaggerLocation;
+        }
+        
+        public URL getJiraJQLURL()
+        {
+            return jiraJQLURL;
         }
     }
 
